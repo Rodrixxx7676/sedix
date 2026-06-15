@@ -18,8 +18,12 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
         if (await db.Users.AnyAsync(u => u.Email == req.Email))
             throw new InvalidOperationException("Email already registered.");
 
-        // First user ever becomes Admin
         var isFirst = !await db.Users.AnyAsync();
+
+        DateOnly? dob = null;
+        if (!string.IsNullOrWhiteSpace(req.DateOfBirth) &&
+            DateOnly.TryParse(req.DateOfBirth, out var parsed))
+            dob = parsed;
 
         var user = new User
         {
@@ -27,6 +31,11 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
             Email = req.Email.ToLowerInvariant(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
             Role = isFirst ? UserRole.Admin : UserRole.User,
+            Phone = req.Phone,
+            Country = req.Country,
+            DateOfBirth = dob,
+            Currency = req.Currency,
+            MonthlyGoal = req.MonthlyGoal,
         };
 
         db.Users.Add(user);

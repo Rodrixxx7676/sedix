@@ -79,17 +79,17 @@ public class GeminiService(IConfiguration config, HttpClient http, AppDbContext 
 
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={apiKey}";
 
+        var fullPrompt = $"{system}\n\n---\n\n{user}";
         var body = new
         {
-            system_instruction = new { parts = new[] { new { text = system } } },
             contents = new[]
             {
-                new { role = "user", parts = new[] { new { text = user } } }
+                new { role = "user", parts = new[] { new { text = fullPrompt } } }
             },
             generationConfig = new
             {
                 temperature = 0.7,
-                maxOutputTokens = 256,
+                maxOutputTokens = 300,
             },
         };
 
