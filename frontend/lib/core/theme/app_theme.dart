@@ -43,7 +43,7 @@ class AppTheme {
   static ThemeData get light => ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: SedixColors.bg,
-        fontFamily: 'Inter',
+        fontFamily: 'Iosevka Charon',
         colorScheme: const ColorScheme.light(
           surface: SedixColors.bg,
           primary: SedixColors.accent,
@@ -60,7 +60,7 @@ class AppTheme {
             color: SedixColors.textPrimary,
             fontSize: 26,
             fontWeight: FontWeight.w700,
-            fontFamily: 'Inter',
+            fontFamily: 'Iosevka Charon',
           ),
           iconTheme: IconThemeData(color: SedixColors.textPrimary),
         ),
