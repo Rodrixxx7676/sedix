@@ -254,7 +254,7 @@ class ProfileScreen extends ConsumerWidget {
 class _StatBox extends StatelessWidget {
   final String value;
   final String label;
-  final IconData icon;
+  final FaIconData icon;
   final Color color;
 
   const _StatBox(
@@ -287,7 +287,7 @@ class _StatBox extends StatelessWidget {
 }
 
 class _MenuTile extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;

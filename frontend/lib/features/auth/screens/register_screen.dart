@@ -678,7 +678,7 @@ class _BottomBar extends StatelessWidget {
 class _ClayField extends StatelessWidget {
   final TextEditingController ctrl;
   final String label;
-  final IconData icon;
+  final FaIconData icon;
   final bool obscure;
   final TextInputType? keyboard;
   final String? Function(String?)? validator;

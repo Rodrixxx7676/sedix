@@ -216,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 class _ClayField extends StatelessWidget {
   final TextEditingController ctrl;
   final String label;
-  final IconData icon;
+  final FaIconData icon;
   final bool obscure;
   final TextInputType? keyboard;
   final String? Function(String?)? validator;
