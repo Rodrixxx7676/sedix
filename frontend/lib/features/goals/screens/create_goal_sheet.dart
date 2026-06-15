@@ -60,7 +60,7 @@ class _CreateGoalSheetState extends ConsumerState<CreateGoalSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('New saving goal',
+            Text('Nueva meta de ahorro',
                 style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 20),
             Wrap(
@@ -76,32 +76,32 @@ class _CreateGoalSheetState extends ConsumerState<CreateGoalSheet> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameCtrl,
-              decoration: const InputDecoration(labelText: 'Goal name'),
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+              decoration: const InputDecoration(labelText: 'Nombre de la meta'),
+              validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _descCtrl,
-              decoration: const InputDecoration(labelText: 'Description (optional)'),
+              decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _amountCtrl,
               decoration: const InputDecoration(
-                  labelText: 'Target amount', prefixText: '\$ '),
+                  labelText: 'Monto objetivo', prefixText: '\$ '),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               validator: (v) {
                 final n = double.tryParse(v ?? '');
-                return n == null || n <= 0 ? 'Enter a valid amount' : null;
+                return n == null || n <= 0 ? 'Ingresa un monto válido' : null;
               },
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
               icon: const FaIcon(FontAwesomeIcons.calendarDay, size: 14),
               label: Text(_deadline == null
-                  ? 'Set deadline (optional)'
-                  : 'Deadline: ${_deadline!.toLocal().toString().split(' ')[0]}'),
+                  ? 'Establecer fecha límite (opcional)'
+                  : 'Fecha límite: ${_deadline!.toLocal().toString().split(' ')[0]}'),
               onPressed: () async {
                 final picked = await showDatePicker(
                   context: context,
@@ -119,7 +119,7 @@ class _CreateGoalSheetState extends ConsumerState<CreateGoalSheet> {
                   ? const SizedBox.square(
                       dimension: 20,
                       child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Create goal'),
+                  : const Text('Crear meta'),
             ),
           ],
         ),

@@ -52,7 +52,7 @@ class _AiAdvisorScreenState extends ConsumerState<AiAdvisorScreen> {
             FaIcon(FontAwesomeIcons.wandMagicSparkles,
                 size: 18, color: SedixColors.accent),
             SizedBox(width: 8),
-            Text('AI Advisor'),
+            Text('Asesor IA'),
           ],
         ),
         actions: [
@@ -60,7 +60,7 @@ class _AiAdvisorScreenState extends ConsumerState<AiAdvisorScreen> {
             TextButton(
               onPressed: () =>
                   ref.read(aiChatProvider.notifier).clear(),
-              child: const Text('Clear',
+              child: const Text('Limpiar',
                   style: TextStyle(color: SedixColors.textSecondary)),
             ),
         ],
@@ -116,10 +116,10 @@ class _WelcomeView extends StatelessWidget {
   const _WelcomeView({required this.onSend});
 
   static const _starters = [
-    'How can I save faster?',
-    'What should I prioritize?',
-    'Give me 3 saving tips',
-    'How do I stay motivated?',
+    '¿Cómo puedo ahorrar más rápido?',
+    '¿Qué meta debo priorizar?',
+    'Dame 3 consejos de ahorro',
+    '¿Cómo mantenerme motivado?',
   ];
 
   @override
@@ -137,7 +137,7 @@ class _WelcomeView extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Sedix AI Advisor',
+                'Asesor IA de Sedix',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -146,7 +146,7 @@ class _WelcomeView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Ask me anything about your saving goals.',
+                'Pregúntame sobre tus metas de ahorro.',
                 style: TextStyle(
                   color: SedixColors.textSecondary,
                   fontSize: 14,
@@ -361,7 +361,7 @@ class _InputBar extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   decoration: const InputDecoration(
-                    hintText: 'Ask your saving advisor...',
+                    hintText: 'Pregunta a tu asesor de ahorro...',
                     hintStyle:
                         TextStyle(color: SedixColors.textSecondary, fontSize: 14),
                     border: OutlineInputBorder(

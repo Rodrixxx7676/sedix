@@ -21,7 +21,7 @@ class AdminScreen extends ConsumerWidget {
             FaIcon(FontAwesomeIcons.shieldHalved,
                 size: 18, color: SedixColors.accent),
             SizedBox(width: 8),
-            Text('Admin Panel'),
+            Text('Panel Admin'),
           ],
         ),
       ),
@@ -43,7 +43,7 @@ class AdminScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
             const Text(
-              'Users',
+              'Usuarios',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -89,18 +89,18 @@ class AdminScreen extends ConsumerWidget {
       showDialog<bool>(
         context: ctx,
         builder: (_) => AlertDialog(
-          title: const Text('Delete user?'),
+          title: const Text('¿Eliminar usuario?'),
           content: Text(
-              'This will permanently delete $name and all their goals.'),
+              'Se eliminará permanentemente a $name y todas sus metas.'),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancel')),
+                child: const Text('Cancelar')),
             FilledButton(
                 onPressed: () => Navigator.pop(ctx, true),
                 style: FilledButton.styleFrom(
                     backgroundColor: Colors.red),
-                child: const Text('Delete')),
+                child: const Text('Eliminar')),
           ],
         ),
       );
@@ -123,22 +123,22 @@ class _StatsGrid extends StatelessWidget {
         childAspectRatio: 1.6,
         children: [
           _StatCard(
-              label: 'Total Users',
+              label: 'Usuarios',
               value: '${stats.totalUsers}',
               icon: FontAwesomeIcons.users,
               color: SedixColors.accent),
           _StatCard(
-              label: 'Total Goals',
+              label: 'Metas totales',
               value: '${stats.totalGoals}',
               icon: FontAwesomeIcons.bullseye,
               color: SedixColors.textPrimary),
           _StatCard(
-              label: 'Completed',
+              label: 'Completadas',
               value: '${stats.completedGoals}',
               icon: FontAwesomeIcons.circleCheck,
               color: SedixColors.success),
           _StatCard(
-              label: 'Total Saved',
+              label: 'Total ahorrado',
               value: '\$${stats.totalSaved.toStringAsFixed(0)}',
               icon: FontAwesomeIcons.coins,
               color: const Color(0xFFD4A017)),
@@ -290,11 +290,11 @@ class _UserCard extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                _Mini('${user.goalCount}', 'goals'),
+                _Mini('${user.goalCount}', 'metas'),
                 const SizedBox(width: 16),
-                _Mini('${user.completedGoals}', 'done'),
+                _Mini('${user.completedGoals}', 'listas'),
                 const SizedBox(width: 16),
-                _Mini('\$${user.totalSaved.toStringAsFixed(0)}', 'saved'),
+                _Mini('\$${user.totalSaved.toStringAsFixed(0)}', 'ahorrado'),
                 const Spacer(),
                 GestureDetector(
                   onTap: onDelete,

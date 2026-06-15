@@ -70,20 +70,20 @@ class GoalDetailScreen extends ConsumerWidget {
                           final confirm = await showDialog<bool>(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: const Text('Delete goal?'),
+                              title: const Text('¿Eliminar meta?'),
                               content:
-                                  const Text('This cannot be undone.'),
+                                  const Text('Esta acción no se puede deshacer.'),
                               actions: [
                                 TextButton(
                                     onPressed: () =>
                                         Navigator.pop(context, false),
-                                    child: const Text('Cancel')),
+                                    child: const Text('Cancelar')),
                                 FilledButton(
                                     onPressed: () =>
                                         Navigator.pop(context, true),
                                     style: FilledButton.styleFrom(
                                         backgroundColor: Colors.red),
-                                    child: const Text('Delete')),
+                                    child: const Text('Eliminar')),
                               ],
                             ),
                           );
@@ -127,7 +127,7 @@ class GoalDetailScreen extends ConsumerWidget {
                                   color: SedixColors.success, size: 18),
                               SizedBox(width: 12),
                               Text(
-                                'Goal completed!',
+                                '¡Meta completada!',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color: SedixColors.success),
@@ -174,7 +174,7 @@ class GoalDetailScreen extends ConsumerWidget {
                       Row(
                         children: [
                           _StatTile(
-                            label: 'Saved',
+                            label: 'Ahorrado',
                             value:
                                 '\$${goal.savedAmount.toStringAsFixed(2)}',
                             icon: FontAwesomeIcons.coins,
@@ -182,7 +182,7 @@ class GoalDetailScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 12),
                           _StatTile(
-                            label: 'Target',
+                            label: 'Objetivo',
                             value:
                                 '\$${goal.targetAmount.toStringAsFixed(2)}',
                             icon: FontAwesomeIcons.bullseye,
@@ -194,7 +194,7 @@ class GoalDetailScreen extends ConsumerWidget {
                       Row(
                         children: [
                           _StatTile(
-                            label: 'Remaining',
+                            label: 'Restante',
                             value:
                                 '\$${goal.remaining.toStringAsFixed(2)}',
                             icon: FontAwesomeIcons.hourglassHalf,
@@ -203,7 +203,7 @@ class GoalDetailScreen extends ConsumerWidget {
                           const SizedBox(width: 12),
                           if (goal.deadline != null)
                             _StatTile(
-                              label: 'Deadline',
+                              label: 'Fecha límite',
                               value: goal.deadline!
                                   .toLocal()
                                   .toString()
@@ -232,7 +232,7 @@ class GoalDetailScreen extends ConsumerWidget {
                                       color: SedixColors.textSecondary),
                                   SizedBox(width: 6),
                                   Text(
-                                    'Notes',
+                                    'Notas',
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: SedixColors.textSecondary,
@@ -293,7 +293,7 @@ class GoalDetailScreen extends ConsumerWidget {
                                     size: 16, color: Colors.white),
                                 SizedBox(width: 10),
                                 Text(
-                                  'Add savings',
+                                  'Agregar ahorros',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w700,

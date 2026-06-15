@@ -18,18 +18,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   final _pageCtrl = PageController();
   int _step = 0;
 
-  // Step 1 — Account
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _form1 = GlobalKey<FormState>();
 
-  // Step 2 — Personal
   final _phoneCtrl = TextEditingController();
   String? _country;
   DateTime? _dob;
 
-  // Step 3 — Preferences
   String _currency = 'USD';
   final _goalCtrl = TextEditingController();
 
@@ -37,12 +34,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   String? _error;
 
   static const _countries = [
-    'Mexico', 'United States', 'Argentina', 'Colombia',
-    'Chile', 'Spain', 'Peru', 'Venezuela', 'Ecuador', 'Other',
+    'México', 'Perú', 'Estados Unidos', 'Argentina', 'Colombia',
+    'Chile', 'España', 'Venezuela', 'Ecuador', 'Otro',
   ];
 
   static const _currencies = [
-    ('USD', '\$ Dollar'),
+    ('USD', '\$ Dólar'),
+    ('PEN', 'S/ Sol PE'),
     ('MXN', '\$ Peso MX'),
     ('EUR', '€ Euro'),
     ('ARS', '\$ Peso AR'),
@@ -85,10 +83,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   }
 
   Future<void> _submit() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final client = ref.read(apiClientProvider);
-      final res = await client.post<Map<String, dynamic>>('/auth/register', data: {
+      final res =
+          await client.post<Map<String, dynamic>>('/auth/register', data: {
         'name': _nameCtrl.text.trim(),
         'email': _emailCtrl.text.trim(),
         'password': _passCtrl.text,
@@ -103,7 +105,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       await ref.read(authNotifierProvider.notifier).saveToken(res.data!['token']);
       if (mounted) context.go('/');
     } catch (_) {
-      setState(() => _error = 'Registration failed. Email may already be in use.');
+      setState(() =>
+          _error = 'Registro fallido. El correo ya puede estar en uso.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -148,7 +151,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             ),
             if (_error != null)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -158,8 +162,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     border: Border.all(color: Colors.red.shade200),
                   ),
                   child: Text(_error!,
-                      style: TextStyle(
-                          color: Colors.red.shade700, fontSize: 13)),
+                      style:
+                          TextStyle(color: Colors.red.shade700, fontSize: 13)),
                 ),
               ),
             _BottomBar(
@@ -183,11 +187,11 @@ class _TopBar extends StatelessWidget {
 
   const _TopBar({required this.step, this.onBack});
 
-  static const _titles = ['Create account', 'About you', 'Your preferences'];
+  static const _titles = ['Crear cuenta', 'Sobre ti', 'Preferencias'];
   static const _subs = [
-    'Set up your login credentials',
-    'Help us personalize your experience',
-    'Set your savings preferences',
+    'Configura tus credenciales de acceso',
+    'Ayúdanos a personalizar tu experiencia',
+    'Configura tus preferencias de ahorro',
   ];
 
   @override
@@ -273,9 +277,9 @@ class _StepIndicator extends StatelessWidget {
       );
 }
 
-// ── Step 1: Account ───────────────────────────────────────────────────────────
+// ── Step 1: Cuenta ────────────────────────────────────────────────────────────
 
-class _Step1 extends StatelessWidget {
+class _Step1 extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController nameCtrl;
   final TextEditingController emailCtrl;
@@ -289,10 +293,31 @@ class _Step1 extends StatelessWidget {
   });
 
   @override
+  State<_Step1> createState() => _Step1State();
+}
+
+class _Step1State extends State<_Step1> {
+  String _pass = '';
+
+  @override
+  void initState() {
+    super.initState();
+    widget.passCtrl.addListener(_onPassChanged);
+  }
+
+  void _onPassChanged() => setState(() => _pass = widget.passCtrl.text);
+
+  @override
+  void dispose() {
+    widget.passCtrl.removeListener(_onPassChanged);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
-          key: formKey,
+          key: widget.formKey,
           child: Column(
             children: [
               Container(
@@ -303,33 +328,104 @@ class _Step1 extends StatelessWidget {
               ),
               const SizedBox(height: 28),
               _ClayField(
-                ctrl: nameCtrl,
-                label: 'Full name',
+                ctrl: widget.nameCtrl,
+                label: 'Nombre completo',
                 icon: FontAwesomeIcons.idCard,
                 validator: (v) =>
-                    v == null || v.isEmpty ? 'Required' : null,
+                    v == null || v.isEmpty ? 'Requerido' : null,
               ),
               const SizedBox(height: 14),
               _ClayField(
-                ctrl: emailCtrl,
-                label: 'Email address',
+                ctrl: widget.emailCtrl,
+                label: 'Correo electrónico',
                 icon: FontAwesomeIcons.envelope,
                 keyboard: TextInputType.emailAddress,
                 validator: (v) =>
-                    v == null || !v.contains('@') ? 'Enter a valid email' : null,
+                    v == null || !v.contains('@') ? 'Correo inválido' : null,
               ),
               const SizedBox(height: 14),
               _ClayField(
-                ctrl: passCtrl,
-                label: 'Password',
+                ctrl: widget.passCtrl,
+                label: 'Contraseña',
                 icon: FontAwesomeIcons.lock,
                 obscure: true,
                 validator: (v) =>
-                    v == null || v.length < 6 ? 'Min 6 characters' : null,
+                    v == null || v.length < 6 ? 'Mínimo 6 caracteres' : null,
               ),
+              if (_pass.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                _PasswordStrength(password: _pass),
+              ],
             ],
           ),
         ),
+      );
+}
+
+// ── Indicador de fortaleza de contraseña ─────────────────────────────────────
+
+class _PasswordStrength extends StatelessWidget {
+  final String password;
+
+  const _PasswordStrength({required this.password});
+
+  bool get _hasLength => password.length >= 6;
+  bool get _hasUpper => password.contains(RegExp(r'[A-Z]'));
+  bool get _hasNumber => password.contains(RegExp(r'[0-9]'));
+  bool get _hasSpecial =>
+      password.contains(RegExp(r'[!@#$%^&*()\-_,.?":{}|<>]'));
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: SedixColors.surfaceHigh,
+          borderRadius: BorderRadius.circular(14),
+          border:
+              Border.all(color: SedixColors.shadowDark.withOpacity(0.5)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _Req(met: _hasLength, text: 'Mínimo 6 caracteres'),
+            const SizedBox(height: 5),
+            _Req(met: _hasUpper, text: 'Una letra mayúscula (A-Z)'),
+            const SizedBox(height: 5),
+            _Req(met: _hasNumber, text: 'Un número (0-9)'),
+            const SizedBox(height: 5),
+            _Req(
+                met: _hasSpecial,
+                text: r'Un carácter especial (!@#$...)'),
+          ],
+        ),
+      );
+}
+
+class _Req extends StatelessWidget {
+  final bool met;
+  final String text;
+
+  const _Req({required this.met, required this.text});
+
+  @override
+  Widget build(BuildContext context) => Row(
+        children: [
+          FaIcon(
+            met ? FontAwesomeIcons.circleCheck : FontAwesomeIcons.circle,
+            size: 11,
+            color: met ? SedixColors.success : SedixColors.textSecondary,
+          ),
+          const SizedBox(width: 7),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 11,
+              color: met ? SedixColors.success : SedixColors.textSecondary,
+              fontWeight: met ? FontWeight.w600 : FontWeight.w400,
+            ),
+          ),
+        ],
       );
 }
 
@@ -365,29 +461,26 @@ class _Step2 extends StatelessWidget {
             ),
             const SizedBox(height: 28),
 
-            // Phone
             _ClayField(
               ctrl: phoneCtrl,
-              label: 'Phone (optional)',
+              label: 'Teléfono (opcional)',
               icon: FontAwesomeIcons.phone,
               keyboard: TextInputType.phone,
             ),
             const SizedBox(height: 14),
 
-            // Country dropdown
             Container(
               decoration: clayBox(radius: 16),
               child: DropdownButtonFormField<String>(
                 value: country,
-                hint: const Text('Country',
+                hint: const Text('País',
                     style: TextStyle(
                         color: SedixColors.textSecondary, fontSize: 14)),
                 decoration: const InputDecoration(
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14),
-                    child: FaIcon(FontAwesomeIcons.flag,
-                        color: SedixColors.textSecondary, size: 16),
-                  ),
+                  prefixIcon: FaIcon(FontAwesomeIcons.flag,
+                      color: SedixColors.textSecondary, size: 16),
+                  prefixIconConstraints:
+                      BoxConstraints(minWidth: 52, minHeight: 48),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                     borderSide: BorderSide.none,
@@ -405,15 +498,14 @@ class _Step2 extends StatelessWidget {
             ),
             const SizedBox(height: 14),
 
-            // Date of birth
             GestureDetector(
               onTap: () async {
                 final picked = await showDatePicker(
                   context: context,
                   initialDate: DateTime(2000),
                   firstDate: DateTime(1920),
-                  lastDate: DateTime.now().subtract(
-                      const Duration(days: 365 * 13)),
+                  lastDate: DateTime.now()
+                      .subtract(const Duration(days: 365 * 13)),
                 );
                 if (picked != null) onDob(picked);
               },
@@ -428,7 +520,7 @@ class _Step2 extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       dob == null
-                          ? 'Date of birth (optional)'
+                          ? 'Fecha de nacimiento (opcional)'
                           : '${dob!.day}/${dob!.month}/${dob!.year}',
                       style: TextStyle(
                         color: dob == null
@@ -449,7 +541,7 @@ class _Step2 extends StatelessWidget {
       );
 }
 
-// ── Step 3: Preferences ───────────────────────────────────────────────────────
+// ── Step 3: Preferencias ──────────────────────────────────────────────────────
 
 class _Step3 extends StatelessWidget {
   final String currency;
@@ -481,7 +573,7 @@ class _Step3 extends StatelessWidget {
             const SizedBox(height: 28),
 
             const Text(
-              'Currency',
+              'Moneda',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -490,7 +582,6 @@ class _Step3 extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // Currency grid
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -522,8 +613,8 @@ class _Step3 extends StatelessWidget {
                                 blurRadius: 10,
                               ),
                               BoxShadow(
-                                color:
-                                    SedixColors.shadowDark.withOpacity(0.55),
+                                color: SedixColors.shadowDark
+                                    .withOpacity(0.55),
                                 offset: const Offset(4, 4),
                                 blurRadius: 10,
                               ),
@@ -546,7 +637,7 @@ class _Step3 extends StatelessWidget {
 
             const SizedBox(height: 24),
             const Text(
-              'Monthly savings goal',
+              'Meta mensual de ahorro',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -557,7 +648,7 @@ class _Step3 extends StatelessWidget {
 
             _ClayField(
               ctrl: goalCtrl,
-              label: 'Amount (optional)',
+              label: 'Monto (opcional)',
               icon: FontAwesomeIcons.piggyBank,
               keyboard:
                   const TextInputType.numberWithOptions(decimal: true),
@@ -578,7 +669,7 @@ class _Step3 extends StatelessWidget {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Setting a monthly goal helps your AI advisor give better tips.',
+                      'Una meta mensual ayuda a tu asesor de IA a darte mejores consejos.',
                       style: TextStyle(
                         fontSize: 12,
                         color: SedixColors.accent,
@@ -594,7 +685,7 @@ class _Step3 extends StatelessWidget {
       );
 }
 
-// ── Bottom bar ────────────────────────────────────────────────────────────────
+// ── Barra inferior ────────────────────────────────────────────────────────────
 
 class _BottomBar extends StatelessWidget {
   final int step;
@@ -621,8 +712,9 @@ class _BottomBar extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color:
-                      loading ? SedixColors.shadowDark : SedixColors.accent,
+                  color: loading
+                      ? SedixColors.shadowDark
+                      : SedixColors.accent,
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: loading
                       ? []
@@ -644,7 +736,7 @@ class _BottomBar extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        step < 2 ? 'Continue →' : 'Create account',
+                        step < 2 ? 'Continuar →' : 'Crear cuenta',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -659,7 +751,7 @@ class _BottomBar extends StatelessWidget {
               GestureDetector(
                 onTap: onLogin,
                 child: const Text(
-                  'Already have an account? Sign in',
+                  '¿Ya tienes cuenta? Inicia sesión',
                   style: TextStyle(
                     color: SedixColors.accent,
                     fontWeight: FontWeight.w600,
@@ -673,7 +765,7 @@ class _BottomBar extends StatelessWidget {
       );
 }
 
-// ── Clay text field ───────────────────────────────────────────────────────────
+// ── Campo de texto clay ───────────────────────────────────────────────────────
 
 class _ClayField extends StatelessWidget {
   final TextEditingController ctrl;
@@ -713,10 +805,10 @@ class _ClayField extends StatelessWidget {
               color: SedixColors.textSecondary,
               fontSize: 13,
             ),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: FaIcon(icon, color: SedixColors.textSecondary, size: 16),
-            ),
+            prefixIcon:
+                FaIcon(icon, color: SedixColors.textSecondary, size: 16),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 52, minHeight: 48),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide.none,

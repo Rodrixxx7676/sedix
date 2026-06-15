@@ -56,18 +56,18 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Add transaction',
+            Text('Agregar transacción',
                 style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 20),
             SegmentedButton<String>(
               segments: const [
                 ButtonSegment(
                     value: 'deposit',
-                    label: Text('Deposit'),
+                    label: Text('Depósito'),
                     icon: FaIcon(FontAwesomeIcons.plus, size: 13)),
                 ButtonSegment(
                     value: 'withdrawal',
-                    label: Text('Withdraw'),
+                    label: Text('Retirar'),
                     icon: FaIcon(FontAwesomeIcons.minus, size: 13)),
               ],
               selected: {_type},
@@ -77,17 +77,17 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             TextFormField(
               controller: _amountCtrl,
               decoration: const InputDecoration(
-                  labelText: 'Amount', prefixText: '\$ '),
+                  labelText: 'Monto', prefixText: '\$ '),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               validator: (v) {
                 final n = double.tryParse(v ?? '');
-                return n == null || n <= 0 ? 'Enter a valid amount' : null;
+                return n == null || n <= 0 ? 'Ingresa un monto válido' : null;
               },
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _noteCtrl,
-              decoration: const InputDecoration(labelText: 'Note (optional)'),
+              decoration: const InputDecoration(labelText: 'Nota (opcional)'),
             ),
             const SizedBox(height: 24),
             FilledButton(
@@ -96,7 +96,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   ? const SizedBox.square(
                       dimension: 20,
                       child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Save'),
+                  : const Text('Guardar'),
             ),
           ],
         ),

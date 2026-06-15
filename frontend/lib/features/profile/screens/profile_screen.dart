@@ -17,7 +17,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: SedixColors.bg,
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: const Text('Perfil')),
       body: FutureBuilder<Map<String, String?>>(
         future: _loadProfile(),
         builder: (context, snap) {
@@ -136,19 +136,19 @@ class ProfileScreen extends ConsumerWidget {
                     children: [
                       _StatBox(
                           value: '${goals.length}',
-                          label: 'Goals',
+                          label: 'Metas',
                           icon: FontAwesomeIcons.bullseye,
                           color: SedixColors.textPrimary),
                       const SizedBox(width: 12),
                       _StatBox(
                           value: '$completed',
-                          label: 'Completed',
+                          label: 'Listas',
                           icon: FontAwesomeIcons.circleCheck,
                           color: SedixColors.success),
                       const SizedBox(width: 12),
                       _StatBox(
                           value: '\$${saved.toStringAsFixed(0)}',
-                          label: 'Saved',
+                          label: 'Ahorrado',
                           icon: FontAwesomeIcons.coins,
                           color: SedixColors.accent),
                     ],
@@ -161,7 +161,7 @@ class ProfileScreen extends ConsumerWidget {
               if (isAdmin) ...[
                 _MenuTile(
                   icon: FontAwesomeIcons.shieldHalved,
-                  label: 'Admin Panel',
+                  label: 'Panel Admin',
                   color: SedixColors.accent,
                   onTap: () => context.go('/admin'),
                 ),
@@ -170,14 +170,14 @@ class ProfileScreen extends ConsumerWidget {
 
               _MenuTile(
                 icon: FontAwesomeIcons.bullseye,
-                label: 'My Goals',
+                label: 'Mis Metas',
                 color: SedixColors.textPrimary,
                 onTap: () => context.go('/goals'),
               ),
               const SizedBox(height: 10),
               _MenuTile(
                 icon: FontAwesomeIcons.wandMagicSparkles,
-                label: 'AI Advisor',
+                label: 'Asesor IA',
                 color: SedixColors.textPrimary,
                 onTap: () => context.go('/ai'),
               ),
@@ -203,7 +203,7 @@ class ProfileScreen extends ConsumerWidget {
                           color: Colors.red.shade600, size: 16),
                       const SizedBox(width: 8),
                       Text(
-                        'Sign out',
+                        'Cerrar sesión',
                         style: TextStyle(
                           color: Colors.red.shade600,
                           fontWeight: FontWeight.w600,

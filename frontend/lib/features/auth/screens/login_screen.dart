@@ -40,7 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authNotifierProvider.notifier).saveToken(res.data!['token']);
       if (mounted) context.go('/');
     } catch (_) {
-      setState(() => _error = 'Invalid email or password.');
+      setState(() => _error = 'Correo o contraseña incorrectos.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -82,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'Save with purpose.',
+                    'Ahorra con propósito.',
                     style: TextStyle(
                       fontSize: 14,
                       color: SedixColors.textSecondary,
@@ -93,17 +93,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   _ClayField(
                     ctrl: _emailCtrl,
-                    label: 'Email',
+                    label: 'Correo electrónico',
                     icon: FontAwesomeIcons.envelope,
                     keyboard: TextInputType.emailAddress,
                     validator: (v) =>
-                        v == null || !v.contains('@') ? 'Enter a valid email' : null,
+                        v == null || !v.contains('@') ? 'Correo inválido' : null,
                   ),
                   const SizedBox(height: 14),
 
                   _ClayField(
                     ctrl: _passCtrl,
-                    label: 'Password',
+                    label: 'Contraseña',
                     icon: FontAwesomeIcons.lock,
                     obscure: !_showPass,
                     suffix: GestureDetector(
@@ -120,7 +120,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     validator: (v) =>
-                        v == null || v.length < 6 ? 'Min 6 characters' : null,
+                        v == null || v.length < 6 ? 'Mínimo 6 caracteres' : null,
                   ),
 
                   if (_error != null) ...[
@@ -178,7 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     size: 16, color: Colors.white),
                                 SizedBox(width: 10),
                                 Text(
-                                  'Sign in',
+                                  'Iniciar sesión',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w700,
@@ -195,7 +195,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   GestureDetector(
                     onTap: () => context.go('/register'),
                     child: const Text(
-                      "Don't have an account? Register",
+                      '¿No tienes cuenta? Regístrate',
                       style: TextStyle(
                         color: SedixColors.accent,
                         fontWeight: FontWeight.w600,
@@ -246,10 +246,10 @@ class _ClayField extends StatelessWidget {
             labelText: label,
             labelStyle: const TextStyle(
                 color: SedixColors.textSecondary, fontSize: 13),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: FaIcon(icon, size: 16, color: SedixColors.textSecondary),
-            ),
+            prefixIcon:
+                FaIcon(icon, size: 16, color: SedixColors.textSecondary),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 52, minHeight: 48),
             suffixIcon: suffix,
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(16)),

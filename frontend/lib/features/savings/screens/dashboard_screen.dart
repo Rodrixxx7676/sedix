@@ -153,7 +153,7 @@ class _Header extends StatelessWidget {
                     ],
                   ),
                   const Text(
-                    'Your saving goals',
+                    'Tus metas de ahorro',
                     style: TextStyle(
                       fontSize: 12,
                       color: SedixColors.textSecondary,
@@ -184,7 +184,7 @@ class _Header extends StatelessWidget {
                     FaIcon(FontAwesomeIcons.plus, size: 13, color: Colors.white),
                     SizedBox(width: 6),
                     Text(
-                      'Create New',
+                      'Nueva meta',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -217,21 +217,21 @@ class _StatsRow extends StatelessWidget {
       child: Row(
         children: [
           _Stat(
-            label: 'Total saved',
+            label: 'Total ahorrado',
             value: '\$${totalSaved.toStringAsFixed(0)}',
             icon: FontAwesomeIcons.coins,
             color: SedixColors.accent,
           ),
           const SizedBox(width: 12),
           _Stat(
-            label: 'Goals',
+            label: 'Metas',
             value: '${goals.length}',
             icon: FontAwesomeIcons.bullseye,
             color: SedixColors.textPrimary,
           ),
           const SizedBox(width: 12),
           _Stat(
-            label: 'Completed',
+            label: 'Completadas',
             value: '$completed',
             icon: FontAwesomeIcons.circleCheck,
             color: SedixColors.success,
@@ -299,13 +299,13 @@ class _EmptyState extends StatelessWidget {
                   size: 52, color: SedixColors.accent),
             ),
             const SizedBox(height: 24),
-            const Text('No goals yet',
+            const Text('Sin metas aún',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: SedixColors.textPrimary)),
             const SizedBox(height: 8),
-            const Text('Create your first saving goal',
+            const Text('Crea tu primera meta de ahorro',
                 style: TextStyle(
                     color: SedixColors.textSecondary, fontSize: 14)),
             const SizedBox(height: 28),
@@ -331,7 +331,7 @@ class _EmptyState extends StatelessWidget {
                     FaIcon(FontAwesomeIcons.plus,
                         size: 14, color: Colors.white),
                     SizedBox(width: 8),
-                    Text('Create goal',
+                    Text('Crear meta',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

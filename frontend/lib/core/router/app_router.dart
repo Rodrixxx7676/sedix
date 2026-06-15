@@ -85,22 +85,22 @@ class _AppShell extends StatelessWidget {
             NavigationDestination(
               icon: FaIcon(FontAwesomeIcons.house, size: 18),
               selectedIcon: FaIcon(FontAwesomeIcons.house, size: 18, color: SedixColors.accent),
-              label: 'Home',
+              label: 'Inicio',
             ),
             NavigationDestination(
               icon: FaIcon(FontAwesomeIcons.bullseye, size: 18),
               selectedIcon: FaIcon(FontAwesomeIcons.bullseye, size: 18, color: SedixColors.accent),
-              label: 'Goals',
+              label: 'Metas',
             ),
             NavigationDestination(
               icon: FaIcon(FontAwesomeIcons.wandMagicSparkles, size: 18),
               selectedIcon: FaIcon(FontAwesomeIcons.wandMagicSparkles, size: 18, color: SedixColors.accent),
-              label: 'AI',
+              label: 'IA',
             ),
             NavigationDestination(
               icon: FaIcon(FontAwesomeIcons.circleUser, size: 18),
               selectedIcon: FaIcon(FontAwesomeIcons.circleUser, size: 18, color: SedixColors.accent),
-              label: 'Profile',
+              label: 'Perfil',
             ),
           ],
         ),

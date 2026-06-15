@@ -167,7 +167,7 @@ class _CardBottom extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  goal.isCompleted ? 'Completed' : 'In Progress',
+                  goal.isCompleted ? 'Completada' : 'En progreso',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -198,7 +198,7 @@ class _CardBottom extends StatelessWidget {
 
           // Label
           Text(
-            goal.isCompleted ? 'Amount Saved' : 'Amount Needed',
+            goal.isCompleted ? 'Monto ahorrado' : 'Monto necesario',
             style: const TextStyle(
               fontSize: 11,
               color: SedixColors.textSecondary,
@@ -254,7 +254,7 @@ class _CardBottom extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: const Text(
-                    'Add Money',
+                    'Agregar dinero',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -282,7 +282,7 @@ class _CardBottom extends StatelessWidget {
                         color: Colors.white, size: 15),
                     SizedBox(width: 6),
                     Text(
-                      'Goal reached!',
+                      '¡Meta lograda!',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,

@@ -28,7 +28,7 @@ class GoalsScreen extends ConsumerWidget {
                       size: 20, color: SedixColors.accent),
                   const SizedBox(width: 10),
                   Text(
-                    'My Goals',
+                    'Mis Metas',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: SedixColors.textPrimary,
@@ -66,7 +66,7 @@ class GoalsScreen extends ConsumerWidget {
                               size: 13, color: Colors.white),
                           SizedBox(width: 6),
                           Text(
-                            'New',
+                            'Nueva',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -98,13 +98,13 @@ class GoalsScreen extends ConsumerWidget {
                                   size: 42, color: SedixColors.accent),
                             ),
                             const SizedBox(height: 20),
-                            const Text('No goals yet',
+                            const Text('Sin metas aún',
                                 style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
                                     color: SedixColors.textPrimary)),
                             const SizedBox(height: 6),
-                            const Text('Create your first saving goal',
+                            const Text('Crea tu primera meta de ahorro',
                                 style: TextStyle(
                                     color: SedixColors.textSecondary,
                                     fontSize: 14)),
