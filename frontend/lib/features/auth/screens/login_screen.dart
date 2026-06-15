@@ -243,9 +243,9 @@ class _ClayField extends StatelessWidget {
           style: const TextStyle(
               color: SedixColors.textPrimary, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
-            labelText: label,
-            labelStyle: const TextStyle(
-                color: SedixColors.textSecondary, fontSize: 13),
+            hintText: label,
+            hintStyle: const TextStyle(
+                color: SedixColors.textSecondary, fontSize: 14),
             prefixIcon:
                 FaIcon(icon, size: 16, color: SedixColors.textSecondary),
             prefixIconConstraints:
@@ -258,7 +258,7 @@ class _ClayField extends StatelessWidget {
             filled: true,
             fillColor: Colors.transparent,
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           ),
         ),
       );

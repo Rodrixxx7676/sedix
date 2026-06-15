@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -104,9 +105,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       });
       await ref.read(authNotifierProvider.notifier).saveToken(res.data!['token']);
       if (mounted) context.go('/');
-    } catch (_) {
-      setState(() =>
-          _error = 'Registro fallido. El correo ya puede estar en uso.');
+    } catch (e) {
+      String msg = 'Error al registrarse. Inténtalo de nuevo.';
+      if (e is DioException) {
+        if (e.response?.statusCode == 409) {
+          msg = 'El correo ya está registrado.';
+        } else if (e.response == null) {
+          msg = 'Sin conexión con el servidor.';
+        }
+      }
+      setState(() => _error = msg);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -799,11 +807,11 @@ class _ClayField extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
-            labelText: label,
+            hintText: label,
             prefixText: prefix,
-            labelStyle: const TextStyle(
+            hintStyle: const TextStyle(
               color: SedixColors.textSecondary,
-              fontSize: 13,
+              fontSize: 14,
             ),
             prefixIcon:
                 FaIcon(icon, color: SedixColors.textSecondary, size: 16),
@@ -816,7 +824,7 @@ class _ClayField extends StatelessWidget {
             filled: true,
             fillColor: Colors.transparent,
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           ),
         ),
       );
