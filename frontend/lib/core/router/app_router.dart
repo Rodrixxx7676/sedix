@@ -1,37 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../theme/app_theme.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
+import '../../features/savings/screens/dashboard_screen.dart';
 import '../../features/goals/screens/goals_screen.dart';
 import '../../features/goals/screens/goal_detail_screen.dart';
-import '../../features/savings/screens/dashboard_screen.dart';
+import '../../features/ai/screens/ai_advisor_screen.dart';
+import '../../features/admin/screens/admin_screen.dart';
+import '../../features/profile/screens/profile_screen.dart';
 
-part 'app_router.g.dart';
-
-@riverpod
-GoRouter appRouter(AppRouterRef ref) {
+final appRouterProvider = Provider<GoRouter>((ref) {
   final isAuthenticated = ref.watch(isAuthenticatedProvider);
 
   return GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
       final loggedIn = isAuthenticated;
-      final onAuth =
-          state.matchedLocation == '/login' || state.matchedLocation == '/register';
-
+      final onAuth = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
       if (!loggedIn && !onAuth) return '/login';
       if (loggedIn && onAuth) return '/';
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (_, __) => const DashboardScreen()),
-      GoRoute(path: '/goals', builder: (_, __) => const GoalsScreen()),
-      GoRoute(
-        path: '/goals/:id',
-        builder: (_, state) =>
-            GoalDetailScreen(goalId: state.pathParameters['id']!),
+      ShellRoute(
+        builder: (context, state, child) =>
+            _AppShell(location: state.matchedLocation, child: child),
+        routes: [
+          GoRoute(path: '/', builder: (_, __) => const DashboardScreen()),
+          GoRoute(path: '/goals', builder: (_, __) => const GoalsScreen()),
+          GoRoute(
+            path: '/goals/:id',
+            builder: (_, state) =>
+                GoalDetailScreen(goalId: state.pathParameters['id']!),
+          ),
+          GoRoute(path: '/ai', builder: (_, __) => const AiAdvisorScreen()),
+          GoRoute(path: '/admin', builder: (_, __) => const AdminScreen()),
+          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+        ],
       ),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
@@ -40,4 +49,58 @@ GoRouter appRouter(AppRouterRef ref) {
       body: Center(child: Text('Page not found: ${state.error}')),
     ),
   );
+});
+
+class _AppShell extends StatelessWidget {
+  final String location;
+  final Widget child;
+
+  const _AppShell({required this.location, required this.child});
+
+  int get _index {
+    if (location == '/') return 0;
+    if (location.startsWith('/goals')) return 1;
+    if (location == '/ai') return 2;
+    return 3;
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: child,
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: SedixColors.bg,
+          indicatorColor: SedixColors.accentLight,
+          selectedIndex: _index,
+          onDestinationSelected: (i) {
+            switch (i) {
+              case 0:
+                context.go('/');
+              case 1:
+                context.go('/goals');
+              case 2:
+                context.go('/ai');
+              case 3:
+                context.go('/profile');
+            }
+          },
+          destinations: const [
+            NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: 'Home'),
+            NavigationDestination(
+                icon: Icon(Icons.flag_outlined),
+                selectedIcon: Icon(Icons.flag),
+                label: 'Goals'),
+            NavigationDestination(
+                icon: Icon(Icons.auto_awesome_outlined),
+                selectedIcon: Icon(Icons.auto_awesome),
+                label: 'AI'),
+            NavigationDestination(
+                icon: Icon(Icons.person_outline),
+                selectedIcon: Icon(Icons.person),
+                label: 'Profile'),
+          ],
+        ),
+      );
 }

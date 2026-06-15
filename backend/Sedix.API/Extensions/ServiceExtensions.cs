@@ -31,8 +31,13 @@ public static class ServiceExtensions
                     ValidAudience = config["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(config["Jwt:Key"]!)),
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role,
                 };
             });
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+
         return services;
     }
 
@@ -76,6 +81,9 @@ public static class ServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IGoalService, GoalService>();
+        services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<IGeminiService, GeminiService>();
+        services.AddHttpClient<GeminiService>();
         return services;
     }
 }

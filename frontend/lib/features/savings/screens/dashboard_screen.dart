@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../goals/models/goal_model.dart';
 import '../../goals/providers/goals_provider.dart';
 import '../../goals/screens/create_goal_sheet.dart';
@@ -37,8 +36,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _Header(
-              onLogout: () =>
-                  ref.read(authNotifierProvider.notifier).logout(),
               onCreateNew: () => showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
@@ -144,10 +141,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 // ── Header ────────────────────────────────────────────────────────────────────
 
 class _Header extends StatelessWidget {
-  final VoidCallback onLogout;
   final VoidCallback onCreateNew;
 
-  const _Header({required this.onLogout, required this.onCreateNew});
+  const _Header({required this.onCreateNew});
 
   @override
   Widget build(BuildContext context) {
@@ -210,17 +206,6 @@ class _Header extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Logout
-          GestureDetector(
-            onTap: onLogout,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: clayBox(radius: 14),
-              child: const Icon(Icons.logout,
-                  size: 18, color: SedixColors.textSecondary),
             ),
           ),
         ],

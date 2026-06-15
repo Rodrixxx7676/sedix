@@ -18,17 +18,22 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
         if (await db.Users.AnyAsync(u => u.Email == req.Email))
             throw new InvalidOperationException("Email already registered.");
 
+        // First user ever becomes Admin
+        var isFirst = !await db.Users.AnyAsync();
+
         var user = new User
         {
             Name = req.Name,
             Email = req.Email.ToLowerInvariant(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
+            Role = isFirst ? UserRole.Admin : UserRole.User,
         };
 
         db.Users.Add(user);
         await db.SaveChangesAsync();
 
-        return new AuthResponse(tokenService.Generate(user), user.Name, user.Email);
+        return new AuthResponse(
+            tokenService.Generate(user), user.Name, user.Email, user.Role.ToString());
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest req)
@@ -40,6 +45,7 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
         if (!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Invalid credentials.");
 
-        return new AuthResponse(tokenService.Generate(user), user.Name, user.Email);
+        return new AuthResponse(
+            tokenService.Generate(user), user.Name, user.Email, user.Role.ToString());
     }
 }

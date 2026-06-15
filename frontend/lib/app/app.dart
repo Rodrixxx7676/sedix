@@ -14,8 +14,6 @@ class SedixApp extends ConsumerWidget {
       title: 'Sedix',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }
