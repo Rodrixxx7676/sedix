@@ -1,0 +1,46 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['frontend/**']
+  pull_request:
+    branches: [main]
+    paths: ['frontend/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: frontend
+        run: flutter analyze
+
+      - name: Test
+        working-directory: frontend
+        run: flutter test
+
+      - name: Build web
+        working-directory: frontend
+        run: flutter build web --release --dart-define=API_URL=https://api.sedix.app/api
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sedix-web
+          path: frontend/build/web/
+          retention-days: 7

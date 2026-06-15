@@ -1,0 +1,45 @@
+# ─── Flutter / Dart ───────────────────────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+frontend/.dart_tool/
+frontend/build/
+*.g.dart
+*.freezed.dart
+
+# ─── .NET / C# ────────────────────────────────────────────────────────────────
+backend/**/.vs/
+backend/**/bin/
+backend/**/obj/
+backend/**/*.user
+backend/**/*.suo
+backend/**/appsettings.Development.json
+backend/**/*.db
+backend/**/*.db-shm
+backend/**/*.db-wal
+*.nupkg
+
+# ─── Secrets / Environment ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+secrets/
+*.pfx
+*.pem
+*.key
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDEs ─────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
