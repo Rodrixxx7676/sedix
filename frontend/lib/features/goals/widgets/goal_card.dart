@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/goal_model.dart';
 import 'goal_jar_widget.dart';
@@ -101,14 +102,14 @@ class _CardTop extends StatelessWidget {
             ),
           ),
 
-          // Nav arrow left placeholder
+          // Nav arrows
           Positioned(
             left: 12,
             top: 0,
             bottom: 0,
             child: Center(
-              child: Icon(Icons.chevron_left,
-                  color: Colors.white.withOpacity(0.5), size: 28),
+              child: FaIcon(FontAwesomeIcons.chevronLeft,
+                  color: Colors.white.withOpacity(0.5), size: 16),
             ),
           ),
           Positioned(
@@ -116,8 +117,8 @@ class _CardTop extends StatelessWidget {
             top: 0,
             bottom: 0,
             child: Center(
-              child: Icon(Icons.chevron_right,
-                  color: Colors.white.withOpacity(0.5), size: 28),
+              child: FaIcon(FontAwesomeIcons.chevronRight,
+                  color: Colors.white.withOpacity(0.5), size: 16),
             ),
           ),
         ],
@@ -277,8 +278,8 @@ class _CardBottom extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.check_circle_outline,
-                        color: Colors.white, size: 16),
+                    FaIcon(FontAwesomeIcons.circleCheck,
+                        color: Colors.white, size: 15),
                     SizedBox(width: 6),
                     Text(
                       'Goal reached!',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../providers/goals_provider.dart';
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
@@ -60,8 +61,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             const SizedBox(height: 20),
             SegmentedButton<String>(
               segments: const [
-                ButtonSegment(value: 'deposit', label: Text('Deposit'), icon: Icon(Icons.add)),
-                ButtonSegment(value: 'withdrawal', label: Text('Withdraw'), icon: Icon(Icons.remove)),
+                ButtonSegment(
+                    value: 'deposit',
+                    label: Text('Deposit'),
+                    icon: FaIcon(FontAwesomeIcons.plus, size: 13)),
+                ButtonSegment(
+                    value: 'withdrawal',
+                    label: Text('Withdraw'),
+                    icon: FaIcon(FontAwesomeIcons.minus, size: 13)),
               ],
               selected: {_type},
               onSelectionChanged: (v) => setState(() => _type = v.first),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/user_stat_model.dart';
 import '../providers/admin_provider.dart';
@@ -17,7 +18,8 @@ class AdminScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Row(
           children: [
-            Text('🛡️', style: TextStyle(fontSize: 20)),
+            FaIcon(FontAwesomeIcons.shieldHalved,
+                size: 18, color: SedixColors.accent),
             SizedBox(width: 8),
             Text('Admin Panel'),
           ],
@@ -123,22 +125,22 @@ class _StatsGrid extends StatelessWidget {
           _StatCard(
               label: 'Total Users',
               value: '${stats.totalUsers}',
-              icon: '👥',
+              icon: FontAwesomeIcons.users,
               color: SedixColors.accent),
           _StatCard(
               label: 'Total Goals',
               value: '${stats.totalGoals}',
-              icon: '🎯',
+              icon: FontAwesomeIcons.bullseye,
               color: SedixColors.textPrimary),
           _StatCard(
               label: 'Completed',
               value: '${stats.completedGoals}',
-              icon: '✅',
+              icon: FontAwesomeIcons.circleCheck,
               color: SedixColors.success),
           _StatCard(
               label: 'Total Saved',
               value: '\$${stats.totalSaved.toStringAsFixed(0)}',
-              icon: '💰',
+              icon: FontAwesomeIcons.coins,
               color: const Color(0xFFD4A017)),
         ],
       );
@@ -147,7 +149,7 @@ class _StatsGrid extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final String label;
   final String value;
-  final String icon;
+  final IconData icon;
   final Color color;
 
   const _StatCard(
@@ -164,7 +166,7 @@ class _StatCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 24)),
+            FaIcon(icon, size: 20, color: color),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -296,8 +298,8 @@ class _UserCard extends StatelessWidget {
                 const Spacer(),
                 GestureDetector(
                   onTap: onDelete,
-                  child: const Icon(Icons.delete_outline,
-                      size: 18, color: Colors.red),
+                  child: const FaIcon(FontAwesomeIcons.trash,
+                      size: 15, color: Colors.red),
                 ),
               ],
             ),

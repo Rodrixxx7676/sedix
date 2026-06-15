@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -92,14 +93,30 @@ class ProfileScreen extends ConsumerWidget {
                         : SedixColors.successLight,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    isAdmin ? '🛡️ Admin' : '👤 User',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      color:
-                          isAdmin ? SedixColors.accent : SedixColors.success,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FaIcon(
+                        isAdmin
+                            ? FontAwesomeIcons.shieldHalved
+                            : FontAwesomeIcons.circleUser,
+                        size: 12,
+                        color: isAdmin
+                            ? SedixColors.accent
+                            : SedixColors.success,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        isAdmin ? 'Admin' : 'User',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: isAdmin
+                              ? SedixColors.accent
+                              : SedixColors.success,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -120,17 +137,20 @@ class ProfileScreen extends ConsumerWidget {
                       _StatBox(
                           value: '${goals.length}',
                           label: 'Goals',
-                          icon: '🎯'),
+                          icon: FontAwesomeIcons.bullseye,
+                          color: SedixColors.textPrimary),
                       const SizedBox(width: 12),
                       _StatBox(
                           value: '$completed',
                           label: 'Completed',
-                          icon: '✅'),
+                          icon: FontAwesomeIcons.circleCheck,
+                          color: SedixColors.success),
                       const SizedBox(width: 12),
                       _StatBox(
                           value: '\$${saved.toStringAsFixed(0)}',
                           label: 'Saved',
-                          icon: '💰'),
+                          icon: FontAwesomeIcons.coins,
+                          color: SedixColors.accent),
                     ],
                   );
                 },
@@ -140,7 +160,7 @@ class ProfileScreen extends ConsumerWidget {
 
               if (isAdmin) ...[
                 _MenuTile(
-                  icon: Icons.shield_outlined,
+                  icon: FontAwesomeIcons.shieldHalved,
                   label: 'Admin Panel',
                   color: SedixColors.accent,
                   onTap: () => context.go('/admin'),
@@ -149,14 +169,14 @@ class ProfileScreen extends ConsumerWidget {
               ],
 
               _MenuTile(
-                icon: Icons.flag_outlined,
+                icon: FontAwesomeIcons.bullseye,
                 label: 'My Goals',
                 color: SedixColors.textPrimary,
                 onTap: () => context.go('/goals'),
               ),
               const SizedBox(height: 10),
               _MenuTile(
-                icon: Icons.auto_awesome_outlined,
+                icon: FontAwesomeIcons.wandMagicSparkles,
                 label: 'AI Advisor',
                 color: SedixColors.textPrimary,
                 onTap: () => context.go('/ai'),
@@ -179,7 +199,8 @@ class ProfileScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.logout, color: Colors.red.shade600, size: 18),
+                      FaIcon(FontAwesomeIcons.rightFromBracket,
+                          color: Colors.red.shade600, size: 16),
                       const SizedBox(width: 8),
                       Text(
                         'Sign out',
@@ -233,10 +254,14 @@ class ProfileScreen extends ConsumerWidget {
 class _StatBox extends StatelessWidget {
   final String value;
   final String label;
-  final String icon;
+  final IconData icon;
+  final Color color;
 
   const _StatBox(
-      {required this.value, required this.label, required this.icon});
+      {required this.value,
+      required this.label,
+      required this.icon,
+      required this.color});
 
   @override
   Widget build(BuildContext context) => Expanded(
@@ -245,7 +270,7 @@ class _StatBox extends StatelessWidget {
           decoration: clayBox(radius: 18),
           child: Column(
             children: [
-              Text(icon, style: const TextStyle(fontSize: 22)),
+              FaIcon(icon, size: 18, color: color),
               const SizedBox(height: 6),
               Text(value,
                   style: const TextStyle(
@@ -282,7 +307,7 @@ class _MenuTile extends StatelessWidget {
           decoration: clayBox(radius: 16),
           child: Row(
             children: [
-              Icon(icon, color: color, size: 20),
+              FaIcon(icon, color: color, size: 16),
               const SizedBox(width: 14),
               Text(label,
                   style: const TextStyle(
@@ -290,8 +315,8 @@ class _MenuTile extends StatelessWidget {
                       fontSize: 15,
                       color: SedixColors.textPrimary)),
               const Spacer(),
-              const Icon(Icons.chevron_right,
-                  color: SedixColors.textSecondary, size: 18),
+              const FaIcon(FontAwesomeIcons.chevronRight,
+                  color: SedixColors.textSecondary, size: 12),
             ],
           ),
         ),

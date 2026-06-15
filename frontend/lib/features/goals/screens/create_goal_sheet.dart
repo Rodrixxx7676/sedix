@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../providers/goals_provider.dart';
 
 class CreateGoalSheet extends ConsumerStatefulWidget {
@@ -97,7 +98,7 @@ class _CreateGoalSheetState extends ConsumerState<CreateGoalSheet> {
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
-              icon: const Icon(Icons.calendar_today, size: 16),
+              icon: const FaIcon(FontAwesomeIcons.calendarDay, size: 14),
               label: Text(_deadline == null
                   ? 'Set deadline (optional)'
                   : 'Deadline: ${_deadline!.toLocal().toString().split(' ')[0]}'),

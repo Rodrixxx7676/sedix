@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/ai_message.dart';
 import '../providers/ai_provider.dart';
@@ -48,7 +49,8 @@ class _AiAdvisorScreenState extends ConsumerState<AiAdvisorScreen> {
       appBar: AppBar(
         title: const Row(
           children: [
-            Text('✨', style: TextStyle(fontSize: 20)),
+            FaIcon(FontAwesomeIcons.wandMagicSparkles,
+                size: 18, color: SedixColors.accent),
             SizedBox(width: 8),
             Text('AI Advisor'),
           ],
@@ -128,9 +130,10 @@ class _WelcomeView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: clayBox(radius: 50),
-                child: const Text('✨', style: TextStyle(fontSize: 48)),
+                child: const FaIcon(FontAwesomeIcons.wandMagicSparkles,
+                    size: 48, color: SedixColors.accent),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -207,7 +210,8 @@ class _MessageBubble extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: const Text('✨', style: TextStyle(fontSize: 14)),
+              child: const FaIcon(FontAwesomeIcons.wandMagicSparkles,
+                  size: 13, color: SedixColors.accent),
             ),
             const SizedBox(width: 8),
           ],
@@ -267,7 +271,8 @@ class _TypingIndicator extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: const Text('✨', style: TextStyle(fontSize: 14)),
+              child: const FaIcon(FontAwesomeIcons.wandMagicSparkles,
+                  size: 13, color: SedixColors.accent),
             ),
             const SizedBox(width: 8),
             Container(
@@ -394,8 +399,8 @@ class _InputBar extends StatelessWidget {
                           ),
                         ],
                 ),
-                child: const Icon(Icons.send_rounded,
-                    color: Colors.white, size: 20),
+                child: const FaIcon(FontAwesomeIcons.paperPlane,
+                    color: Colors.white, size: 16),
               ),
             ),
           ],

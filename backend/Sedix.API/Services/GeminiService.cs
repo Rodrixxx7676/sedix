@@ -11,8 +11,11 @@ public interface IGeminiService
     Task<AiAdviceResponse> GetAdviceAsync(Guid userId, AiAdviceRequest req);
 }
 
-public class GeminiService(IConfiguration config, HttpClient http, AppDbContext db) : IGeminiService
+public class GeminiService(IConfiguration config, AppDbContext db) : IGeminiService
 {
+    // Static HttpClient — avoids per-request socket exhaustion and DI scope issues
+    private static readonly HttpClient Http = new();
+
     private static readonly string[] DefaultSuggestions =
     [
         "How can I reach my goal faster?",
@@ -35,74 +38,89 @@ public class GeminiService(IConfiguration config, HttpClient http, AppDbContext 
                 $"({g.Progress:F1}% complete)" +
                 (g.Deadline.HasValue ? $", deadline {g.Deadline:yyyy-MM-dd}" : "")));
 
-        GoalDtos.GoalResponse? targetGoal = null;
+        var focusGoalLine = "";
         if (req.GoalId.HasValue)
         {
-            var g = goals.FirstOrDefault(g => g.Id == req.GoalId.Value);
+            var g = goals.FirstOrDefault(x => x.Id == req.GoalId.Value);
             if (g is not null)
-                targetGoal = new GoalDtos.GoalResponse(
-                    g.Id, g.Name, g.Description, g.TargetAmount,
-                    g.SavedAmount, g.Progress, g.IsCompleted, g.Deadline, g.Emoji, g.CreatedAt);
+                focusGoalLine = $"\nFocused goal: {g.Emoji} {g.Name} — ${g.SavedAmount:F2} / ${g.TargetAmount:F2}\n";
         }
 
-        var systemPrompt =
-            "You are Seди, a friendly and practical personal savings advisor inside the Sedix app. " +
-            "Keep answers concise (2-4 sentences), motivating, and actionable. " +
-            "When relevant, mention specific amounts or timeframes from the user's goals. " +
-            "Always reply in the same language the user writes in.";
+        var prompt =
+            "You are Sedix, a friendly personal savings advisor. " +
+            "Reply in 2-4 sentences, be motivating and specific. " +
+            "Reply in the same language the user writes in.\n\n" +
+            $"User's goals:\n{goalContext}{focusGoalLine}\n\n" +
+            $"User: {req.Question}";
 
-        var userMessage =
-            $"User's saving goals:\n{goalContext}\n\n" +
-            (targetGoal is not null ? $"Focused goal: {targetGoal.Emoji} {targetGoal.Name}\n\n" : "") +
-            $"User question: {req.Question}";
+        var answer = await CallGeminiAsync(prompt);
 
-        var answer = await CallGeminiAsync(systemPrompt, userMessage);
-
-        var suggestions = targetGoal is not null
+        var suggestions = req.GoalId.HasValue
             ? new[]
             {
-                $"How much do I need to save per week for {targetGoal.Name}?",
-                $"When will I complete {targetGoal.Name} at my current pace?",
-                "What if I increase my savings by 20%?",
-                "Give me 3 tips to reach this goal faster.",
+                "How much should I save per week?",
+                "When will I reach this goal?",
+                "Give me 3 tips to save faster.",
+                "What if I increase savings by 20%?",
             }
             : DefaultSuggestions;
 
         return new AiAdviceResponse(answer, suggestions);
     }
 
-    private async Task<string> CallGeminiAsync(string system, string user)
+    private async Task<string> CallGeminiAsync(string prompt)
     {
         var apiKey = config["Gemini:ApiKey"];
+
         if (string.IsNullOrWhiteSpace(apiKey) || apiKey == "YOUR_GEMINI_API_KEY")
-            return "AI advisor is not configured yet. Ask your admin to set up the Gemini API key.";
+            return "AI advisor is not configured. Ask your admin to add the Gemini API key.";
 
-        var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={apiKey}";
+        var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={apiKey}";
 
-        var fullPrompt = $"{system}\n\n---\n\n{user}";
-        var body = new
+        var body = JsonSerializer.Serialize(new
         {
             contents = new[]
             {
-                new { role = "user", parts = new[] { new { text = fullPrompt } } }
+                new
+                {
+                    role = "user",
+                    parts = new[] { new { text = prompt } }
+                }
             },
             generationConfig = new
             {
                 temperature = 0.7,
                 maxOutputTokens = 300,
             },
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = new StringContent(body, Encoding.UTF8, "application/json")
         };
 
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await http.PostAsync(url, content);
+        var response = await Http.SendAsync(request);
+        var raw = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
-            return "I couldn't connect to the AI service right now. Please try again later.";
+        {
+            // Extract Gemini error message for easier debugging
+            try
+            {
+                using var err = JsonDocument.Parse(raw);
+                var msg = err.RootElement
+                    .GetProperty("error")
+                    .GetProperty("message")
+                    .GetString();
+                return $"Gemini error: {msg}";
+            }
+            catch
+            {
+                return $"Gemini error ({(int)response.StatusCode}): {raw[..Math.Min(raw.Length, 200)]}";
+            }
+        }
 
-        var raw = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(raw);
-
         return doc.RootElement
             .GetProperty("candidates")[0]
             .GetProperty("content")
@@ -110,13 +128,4 @@ public class GeminiService(IConfiguration config, HttpClient http, AppDbContext 
             .GetProperty("text")
             .GetString() ?? "No response.";
     }
-}
-
-// Nested DTO for internal use
-file static class GoalDtos
-{
-    public record GoalResponse(
-        Guid Id, string Name, string? Description,
-        decimal TargetAmount, decimal SavedAmount, decimal Progress,
-        bool IsCompleted, DateTime? Deadline, string Emoji, DateTime CreatedAt);
 }

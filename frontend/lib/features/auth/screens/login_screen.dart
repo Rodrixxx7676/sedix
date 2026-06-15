@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_theme.dart';
@@ -17,6 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _loading = false;
+  bool _showPass = false;
   String? _error;
 
   @override
@@ -28,20 +30,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    setState(() { _loading = true; _error = null; });
     try {
       final client = ref.read(apiClientProvider);
-      final res =
-          await client.post<Map<String, dynamic>>('/auth/login', data: {
+      final res = await client.post<Map<String, dynamic>>('/auth/login', data: {
         'email': _emailCtrl.text.trim(),
         'password': _passCtrl.text,
       });
-      await ref
-          .read(authNotifierProvider.notifier)
-          .saveToken(res.data!['token']);
+      await ref.read(authNotifierProvider.notifier).saveToken(res.data!['token']);
       if (mounted) context.go('/');
     } catch (_) {
       setState(() => _error = 'Invalid email or password.');
@@ -64,19 +60,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo clay box
+                  // Logo
                   Container(
-                    padding: const EdgeInsets.all(22),
-                    decoration: clayBox(radius: 28),
-                    child: const Text('🏦',
-                        style: TextStyle(fontSize: 44)),
+                    padding: const EdgeInsets.all(24),
+                    decoration: clayBox(radius: 32),
+                    child: const FaIcon(
+                      FontAwesomeIcons.piggyBank,
+                      size: 48,
+                      color: SedixColors.accent,
+                    ),
                   ),
-                  const SizedBox(height: 28),
-
+                  const SizedBox(height: 24),
                   const Text(
                     'Sedix',
                     style: TextStyle(
-                      fontSize: 34,
+                      fontSize: 36,
                       fontWeight: FontWeight.w800,
                       color: SedixColors.textPrimary,
                       letterSpacing: -0.5,
@@ -93,52 +91,63 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Email field
                   _ClayField(
-                    controller: _emailCtrl,
+                    ctrl: _emailCtrl,
                     label: 'Email',
-                    icon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
+                    icon: FontAwesomeIcons.envelope,
+                    keyboard: TextInputType.emailAddress,
                     validator: (v) =>
-                        v == null || !v.contains('@')
-                            ? 'Enter a valid email'
-                            : null,
+                        v == null || !v.contains('@') ? 'Enter a valid email' : null,
                   ),
                   const SizedBox(height: 14),
 
-                  // Password field
                   _ClayField(
-                    controller: _passCtrl,
+                    ctrl: _passCtrl,
                     label: 'Password',
-                    icon: Icons.lock_outline,
-                    obscure: true,
+                    icon: FontAwesomeIcons.lock,
+                    obscure: !_showPass,
+                    suffix: GestureDetector(
+                      onTap: () => setState(() => _showPass = !_showPass),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 14),
+                        child: FaIcon(
+                          _showPass
+                              ? FontAwesomeIcons.eyeSlash
+                              : FontAwesomeIcons.eye,
+                          size: 14,
+                          color: SedixColors.textSecondary,
+                        ),
+                      ),
+                    ),
                     validator: (v) =>
-                        v == null || v.length < 6
-                            ? 'Min 6 characters'
-                            : null,
+                        v == null || v.length < 6 ? 'Min 6 characters' : null,
                   ),
 
                   if (_error != null) ...[
                     const SizedBox(height: 14),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.red.shade50,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.red.shade200),
                       ),
-                      child: Text(
-                        _error!,
-                        style:
-                            TextStyle(color: Colors.red.shade700, fontSize: 13),
+                      child: Row(
+                        children: [
+                          FaIcon(FontAwesomeIcons.circleExclamation,
+                              size: 14, color: Colors.red.shade600),
+                          const SizedBox(width: 8),
+                          Text(_error!,
+                              style: TextStyle(
+                                  color: Colors.red.shade700, fontSize: 13)),
+                        ],
                       ),
                     ),
                   ],
 
                   const SizedBox(height: 28),
 
-                  // Sign in button
                   GestureDetector(
                     onTap: _loading ? null : _submit,
                     child: Container(
@@ -160,18 +169,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ? const SizedBox.square(
                               dimension: 20,
                               child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                                  strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text(
-                              'Sign in',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                                letterSpacing: 0.3,
-                              ),
+                          : const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                FaIcon(FontAwesomeIcons.rightToBracket,
+                                    size: 16, color: Colors.white),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Sign in',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
                     ),
                   ),
@@ -199,67 +213,52 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-// ── Clay text field ───────────────────────────────────────────────────────────
-
 class _ClayField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController ctrl;
   final String label;
   final IconData icon;
   final bool obscure;
-  final TextInputType? keyboardType;
+  final TextInputType? keyboard;
   final String? Function(String?)? validator;
+  final Widget? suffix;
 
   const _ClayField({
-    required this.controller,
+    required this.ctrl,
     required this.label,
     required this.icon,
     this.obscure = false,
-    this.keyboardType,
+    this.keyboard,
     this.validator,
+    this.suffix,
   });
 
   @override
   Widget build(BuildContext context) => Container(
-        decoration: BoxDecoration(
-          color: SedixColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withOpacity(0.85),
-              offset: const Offset(-5, -5),
-              blurRadius: 12,
-            ),
-            BoxShadow(
-              color: SedixColors.shadowDark.withOpacity(0.55),
-              offset: const Offset(5, 5),
-              blurRadius: 12,
-            ),
-          ],
-        ),
+        decoration: clayBox(radius: 16),
         child: TextFormField(
-          controller: controller,
+          controller: ctrl,
           obscureText: obscure,
-          keyboardType: keyboardType,
+          keyboardType: keyboard,
           validator: validator,
           style: const TextStyle(
-            color: SedixColors.textPrimary,
-            fontWeight: FontWeight.w500,
-          ),
+              color: SedixColors.textPrimary, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             labelText: label,
             labelStyle: const TextStyle(
-              color: SedixColors.textSecondary,
-              fontSize: 13,
+                color: SedixColors.textSecondary, fontSize: 13),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: FaIcon(icon, size: 16, color: SedixColors.textSecondary),
             ),
-            prefixIcon: Icon(icon, color: SedixColors.textSecondary, size: 18),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+            suffixIcon: suffix,
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide.none,
             ),
             filled: true,
             fillColor: Colors.transparent,
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
         ),
       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../goals/models/goal_model.dart';
@@ -25,6 +26,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     super.dispose();
   }
 
+  void _showCreate() => showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: SedixColors.surfaceHigh,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        builder: (_) => const CreateGoalSheet(),
+      );
+
   @override
   Widget build(BuildContext context) {
     final goalsAsync = ref.watch(goalsProvider);
@@ -35,46 +45,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Header(
-              onCreateNew: () => showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: SedixColors.surfaceHigh,
-                shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(28)),
-                ),
-                builder: (_) => const CreateGoalSheet(),
-              ),
-            ),
-
+            _Header(onCreateNew: _showCreate),
             const SizedBox(height: 8),
 
-            // Stats row
             goalsAsync.whenData((goals) => _StatsRow(goals: goals)).valueOrNull ??
                 const SizedBox.shrink(),
 
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
 
-            // Card carousel
             Expanded(
               child: goalsAsync.when(
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text('Error: $e')),
                 data: (goals) => goals.isEmpty
-                    ? _EmptyState(
-                        onCreateNew: () => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: SedixColors.surfaceHigh,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(28)),
-                          ),
-                          builder: (_) => const CreateGoalSheet(),
-                        ),
-                      )
+                    ? _EmptyState(onCreateNew: _showCreate)
                     : Column(
                         children: [
                           Expanded(
@@ -98,15 +82,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                       borderRadius: BorderRadius.vertical(
                                           top: Radius.circular(28)),
                                     ),
-                                    builder: (_) => AddTransactionSheet(
-                                        goalId: goals[i].id),
+                                    builder: (_) =>
+                                        AddTransactionSheet(goalId: goals[i].id),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Page dots
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(
@@ -146,72 +129,75 @@ class _Header extends StatelessWidget {
   const _Header({required this.onCreateNew});
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 20, 0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Sedix',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: SedixColors.textPrimary,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const Text(
-                  'Your saving goals',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: SedixColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Create New button
-          GestureDetector(
-            onTap: onCreateNew,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: SedixColors.accent,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: SedixColors.accent.withOpacity(0.38),
-                    offset: const Offset(0, 6),
-                    blurRadius: 14,
-                  ),
-                ],
-              ),
-              child: const Row(
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 20, 20, 0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.add, color: Colors.white, size: 16),
-                  SizedBox(width: 4),
-                  Text(
-                    'Create New',
+                  Row(
+                    children: [
+                      const FaIcon(FontAwesomeIcons.piggyBank,
+                          size: 22, color: SedixColors.accent),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Sedix',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: SedixColors.textPrimary,
+                              letterSpacing: -0.5,
+                            ),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    'Your saving goals',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
+                      fontSize: 12,
+                      color: SedixColors.textSecondary,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            GestureDetector(
+              onTap: onCreateNew,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: SedixColors.accent,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: SedixColors.accent.withOpacity(0.38),
+                      offset: const Offset(0, 6),
+                      blurRadius: 14,
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  children: [
+                    FaIcon(FontAwesomeIcons.plus, size: 13, color: Colors.white),
+                    SizedBox(width: 6),
+                    Text(
+                      'Create New',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 }
 
 // ── Stats row ─────────────────────────────────────────────────────────────────
@@ -233,18 +219,21 @@ class _StatsRow extends StatelessWidget {
           _Stat(
             label: 'Total saved',
             value: '\$${totalSaved.toStringAsFixed(0)}',
+            icon: FontAwesomeIcons.coins,
             color: SedixColors.accent,
           ),
           const SizedBox(width: 12),
           _Stat(
             label: 'Goals',
             value: '${goals.length}',
+            icon: FontAwesomeIcons.bullseye,
             color: SedixColors.textPrimary,
           ),
           const SizedBox(width: 12),
           _Stat(
             label: 'Completed',
             value: '$completed',
+            icon: FontAwesomeIcons.circleCheck,
             color: SedixColors.success,
           ),
         ],
@@ -256,34 +245,35 @@ class _StatsRow extends StatelessWidget {
 class _Stat extends StatelessWidget {
   final String label;
   final String value;
+  final IconData icon;
   final Color color;
 
-  const _Stat({required this.label, required this.value, required this.color});
+  const _Stat(
+      {required this.label,
+      required this.value,
+      required this.icon,
+      required this.color});
 
   @override
   Widget build(BuildContext context) => Expanded(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: clayBox(radius: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                ),
-              ),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: SedixColors.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              FaIcon(icon, size: 14, color: color),
+              const SizedBox(height: 6),
+              Text(value,
+                  style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      color: color)),
+              Text(label,
+                  style: const TextStyle(
+                      fontSize: 10,
+                      color: SedixColors.textSecondary,
+                      fontWeight: FontWeight.w500)),
             ],
           ),
         ),
@@ -305,25 +295,19 @@ class _EmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(28),
               decoration: clayBox(radius: 60),
-              child: const Text('🏦', style: TextStyle(fontSize: 52)),
+              child: const FaIcon(FontAwesomeIcons.jar,
+                  size: 52, color: SedixColors.accent),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'No goals yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: SedixColors.textPrimary,
-              ),
-            ),
+            const Text('No goals yet',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: SedixColors.textPrimary)),
             const SizedBox(height: 8),
-            const Text(
-              'Create your first saving goal',
-              style: TextStyle(
-                color: SedixColors.textSecondary,
-                fontSize: 14,
-              ),
-            ),
+            const Text('Create your first saving goal',
+                style: TextStyle(
+                    color: SedixColors.textSecondary, fontSize: 14)),
             const SizedBox(height: 28),
             GestureDetector(
               onTap: onCreateNew,
@@ -341,13 +325,18 @@ class _EmptyState extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Text(
-                  'Create goal',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                  ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FaIcon(FontAwesomeIcons.plus,
+                        size: 14, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text('Create goal',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15)),
+                  ],
                 ),
               ),
             ),

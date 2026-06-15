@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_theme.dart';
@@ -200,8 +201,8 @@ class _TopBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: clayBox(radius: 12),
-                  child: const Icon(Icons.arrow_back_ios_new,
-                      size: 16, color: SedixColors.textPrimary),
+                  child: const FaIcon(FontAwesomeIcons.chevronLeft,
+                      size: 14, color: SedixColors.textPrimary),
                 ),
               )
             else
@@ -294,17 +295,17 @@ class _Step1 extends StatelessWidget {
           key: formKey,
           child: Column(
             children: [
-              // Emoji icon
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: clayBox(radius: 48),
-                child: const Text('👤', style: TextStyle(fontSize: 44)),
+                child: const FaIcon(FontAwesomeIcons.circleUser,
+                    size: 44, color: SedixColors.accent),
               ),
               const SizedBox(height: 28),
               _ClayField(
                 ctrl: nameCtrl,
                 label: 'Full name',
-                icon: Icons.badge_outlined,
+                icon: FontAwesomeIcons.idCard,
                 validator: (v) =>
                     v == null || v.isEmpty ? 'Required' : null,
               ),
@@ -312,7 +313,7 @@ class _Step1 extends StatelessWidget {
               _ClayField(
                 ctrl: emailCtrl,
                 label: 'Email address',
-                icon: Icons.email_outlined,
+                icon: FontAwesomeIcons.envelope,
                 keyboard: TextInputType.emailAddress,
                 validator: (v) =>
                     v == null || !v.contains('@') ? 'Enter a valid email' : null,
@@ -321,7 +322,7 @@ class _Step1 extends StatelessWidget {
               _ClayField(
                 ctrl: passCtrl,
                 label: 'Password',
-                icon: Icons.lock_outline,
+                icon: FontAwesomeIcons.lock,
                 obscure: true,
                 validator: (v) =>
                     v == null || v.length < 6 ? 'Min 6 characters' : null,
@@ -359,7 +360,8 @@ class _Step2 extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: clayBox(radius: 48),
-              child: const Text('🌍', style: TextStyle(fontSize: 44)),
+              child: const FaIcon(FontAwesomeIcons.earthAmericas,
+                  size: 44, color: SedixColors.accent),
             ),
             const SizedBox(height: 28),
 
@@ -367,7 +369,7 @@ class _Step2 extends StatelessWidget {
             _ClayField(
               ctrl: phoneCtrl,
               label: 'Phone (optional)',
-              icon: Icons.phone_outlined,
+              icon: FontAwesomeIcons.phone,
               keyboard: TextInputType.phone,
             ),
             const SizedBox(height: 14),
@@ -381,8 +383,11 @@ class _Step2 extends StatelessWidget {
                     style: TextStyle(
                         color: SedixColors.textSecondary, fontSize: 14)),
                 decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.flag_outlined,
-                      color: SedixColors.textSecondary, size: 18),
+                  prefixIcon: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14),
+                    child: FaIcon(FontAwesomeIcons.flag,
+                        color: SedixColors.textSecondary, size: 16),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                     borderSide: BorderSide.none,
@@ -418,8 +423,8 @@ class _Step2 extends StatelessWidget {
                 decoration: clayBox(radius: 16),
                 child: Row(
                   children: [
-                    const Icon(Icons.cake_outlined,
-                        color: SedixColors.textSecondary, size: 18),
+                    const FaIcon(FontAwesomeIcons.cakeCandles,
+                        color: SedixColors.textSecondary, size: 16),
                     const SizedBox(width: 12),
                     Text(
                       dob == null
@@ -433,8 +438,8 @@ class _Step2 extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    const Icon(Icons.calendar_today,
-                        color: SedixColors.textSecondary, size: 16),
+                    const FaIcon(FontAwesomeIcons.calendarDay,
+                        color: SedixColors.textSecondary, size: 14),
                   ],
                 ),
               ),
@@ -469,7 +474,8 @@ class _Step3 extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: clayBox(radius: 48),
-                child: const Text('💰', style: TextStyle(fontSize: 44)),
+                child: const FaIcon(FontAwesomeIcons.coins,
+                    size: 44, color: SedixColors.accent),
               ),
             ),
             const SizedBox(height: 28),
@@ -552,7 +558,7 @@ class _Step3 extends StatelessWidget {
             _ClayField(
               ctrl: goalCtrl,
               label: 'Amount (optional)',
-              icon: Icons.savings_outlined,
+              icon: FontAwesomeIcons.piggyBank,
               keyboard:
                   const TextInputType.numberWithOptions(decimal: true),
               prefix: '\$ ',
@@ -567,7 +573,8 @@ class _Step3 extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Text('💡', style: TextStyle(fontSize: 18)),
+                  FaIcon(FontAwesomeIcons.lightbulb,
+                      size: 16, color: SedixColors.accent),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -706,7 +713,10 @@ class _ClayField extends StatelessWidget {
               color: SedixColors.textSecondary,
               fontSize: 13,
             ),
-            prefixIcon: Icon(icon, color: SedixColors.textSecondary, size: 18),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: FaIcon(icon, color: SedixColors.textSecondary, size: 16),
+            ),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide.none,

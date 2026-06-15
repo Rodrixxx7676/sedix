@@ -82,7 +82,7 @@ public static class ServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IGoalService, GoalService>();
         services.AddScoped<IAdminService, AdminService>();
-        services.AddHttpClient<IGeminiService, GeminiService>();
+        services.AddScoped<IGeminiService, GeminiService>();
         return services;
     }
 }

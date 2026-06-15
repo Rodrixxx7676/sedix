@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -68,38 +69,39 @@ class _AppShell extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         body: child,
         bottomNavigationBar: NavigationBar(
-          backgroundColor: SedixColors.bg,
+          backgroundColor: SedixColors.surface,
           indicatorColor: SedixColors.accentLight,
           selectedIndex: _index,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (i) {
             switch (i) {
-              case 0:
-                context.go('/');
-              case 1:
-                context.go('/goals');
-              case 2:
-                context.go('/ai');
-              case 3:
-                context.go('/profile');
+              case 0: context.go('/');
+              case 1: context.go('/goals');
+              case 2: context.go('/ai');
+              case 3: context.go('/profile');
             }
           },
           destinations: const [
             NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: 'Home'),
+              icon: FaIcon(FontAwesomeIcons.house, size: 18),
+              selectedIcon: FaIcon(FontAwesomeIcons.house, size: 18, color: SedixColors.accent),
+              label: 'Home',
+            ),
             NavigationDestination(
-                icon: Icon(Icons.flag_outlined),
-                selectedIcon: Icon(Icons.flag),
-                label: 'Goals'),
+              icon: FaIcon(FontAwesomeIcons.bullseye, size: 18),
+              selectedIcon: FaIcon(FontAwesomeIcons.bullseye, size: 18, color: SedixColors.accent),
+              label: 'Goals',
+            ),
             NavigationDestination(
-                icon: Icon(Icons.auto_awesome_outlined),
-                selectedIcon: Icon(Icons.auto_awesome),
-                label: 'AI'),
+              icon: FaIcon(FontAwesomeIcons.wandMagicSparkles, size: 18),
+              selectedIcon: FaIcon(FontAwesomeIcons.wandMagicSparkles, size: 18, color: SedixColors.accent),
+              label: 'AI',
+            ),
             NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person),
-                label: 'Profile'),
+              icon: FaIcon(FontAwesomeIcons.circleUser, size: 18),
+              selectedIcon: FaIcon(FontAwesomeIcons.circleUser, size: 18, color: SedixColors.accent),
+              label: 'Profile',
+            ),
           ],
         ),
       );
