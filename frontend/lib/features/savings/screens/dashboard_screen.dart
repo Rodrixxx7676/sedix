@@ -1,176 +1,372 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../goals/models/goal_model.dart';
 import '../../goals/providers/goals_provider.dart';
+import '../../goals/screens/create_goal_sheet.dart';
+import '../../goals/widgets/add_transaction_sheet.dart';
 import '../../goals/widgets/goal_card.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  final _pageCtrl = PageController(viewportFraction: 0.82);
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final goalsAsync = ref.watch(goalsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sedix'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign out',
-            onPressed: () =>
-                ref.read(authNotifierProvider.notifier).logout(),
-          ),
-        ],
-      ),
-      body: goalsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (goals) {
-          final totalSaved = goals.fold(0.0, (s, g) => s + g.savedAmount);
-          final totalTarget = goals.fold(0.0, (s, g) => s + g.targetAmount);
-          final completed = goals.where((g) => g.isCompleted).length;
-
-          return RefreshIndicator(
-            onRefresh: () => ref.read(goalsProvider.notifier).refresh(),
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Overview',
-                            style: Theme.of(context).textTheme.titleMedium),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            _StatCard(
-                              label: 'Total saved',
-                              value: '\$${totalSaved.toStringAsFixed(0)}',
-                              icon: Icons.savings,
-                            ),
-                            const SizedBox(width: 12),
-                            _StatCard(
-                              label: 'Goals',
-                              value: '${goals.length}',
-                              icon: Icons.flag,
-                            ),
-                            const SizedBox(width: 12),
-                            _StatCard(
-                              label: 'Completed',
-                              value: '$completed',
-                              icon: Icons.check_circle,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Active goals',
-                                style: Theme.of(context).textTheme.titleMedium),
-                            TextButton(
-                              onPressed: () => context.go('/goals'),
-                              child: const Text('See all'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+      backgroundColor: SedixColors.bg,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _Header(
+              onLogout: () =>
+                  ref.read(authNotifierProvider.notifier).logout(),
+              onCreateNew: () => showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: SedixColors.surfaceHigh,
+                shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(28)),
                 ),
-                if (goals.isEmpty)
-                  const SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                builder: (_) => const CreateGoalSheet(),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // Stats row
+            goalsAsync.whenData((goals) => _StatsRow(goals: goals)).valueOrNull ??
+                const SizedBox.shrink(),
+
+            const SizedBox(height: 28),
+
+            // Card carousel
+            Expanded(
+              child: goalsAsync.when(
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
+                data: (goals) => goals.isEmpty
+                    ? _EmptyState(
+                        onCreateNew: () => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: SedixColors.surfaceHigh,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(28)),
+                          ),
+                          builder: (_) => const CreateGoalSheet(),
+                        ),
+                      )
+                    : Column(
                         children: [
-                          Text('🏦', style: TextStyle(fontSize: 56)),
-                          SizedBox(height: 16),
-                          Text('Start your first saving goal!'),
-                          SizedBox(height: 8),
-                          Text('Tap Goals to get started.',
-                              style: TextStyle(color: Colors.grey)),
+                          Expanded(
+                            child: PageView.builder(
+                              controller: _pageCtrl,
+                              itemCount: goals.length,
+                              onPageChanged: (i) =>
+                                  setState(() => _currentPage = i),
+                              itemBuilder: (_, i) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
+                                child: GoalCard(
+                                  goal: goals[i],
+                                  onTap: () =>
+                                      context.go('/goals/${goals[i].id}'),
+                                  onAddMoney: () => showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: SedixColors.surfaceHigh,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(28)),
+                                    ),
+                                    builder: (_) => AddTransactionSheet(
+                                        goalId: goals[i].id),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Page dots
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              goals.length,
+                              (i) => AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                width: _currentPage == i ? 20 : 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: _currentPage == i
+                                      ? SedixColors.accent
+                                      : SedixColors.shadowDark,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                         ],
                       ),
-                    ),
-                  )
-                else
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    sliver: SliverList.separated(
-                      itemCount: goals.take(5).length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (_, i) {
-                        final g = goals[i];
-                        return GoalCard(
-                          goal: g,
-                          onTap: () => context.go('/goals/${g.id}'),
-                        );
-                      },
-                    ),
-                  ),
-              ],
+              ),
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.flag), label: 'Goals'),
-        ],
-        onDestinationSelected: (i) {
-          if (i == 1) context.go('/goals');
-        },
+          ],
+        ),
       ),
     );
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
+// ── Header ────────────────────────────────────────────────────────────────────
 
-  const _StatCard({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
+class _Header extends StatelessWidget {
+  final VoidCallback onLogout;
+  final VoidCallback onCreateNew;
+
+  const _Header({required this.onLogout, required this.onCreateNew});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Expanded(
-      child: Card(
-        color: scheme.surfaceContainerLow,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 18, color: scheme.primary),
-              const SizedBox(height: 8),
-              Text(value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-              Text(label,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant)),
-            ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 20, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sedix',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: SedixColors.textPrimary,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const Text(
+                  'Your saving goals',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: SedixColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          // Create New button
+          GestureDetector(
+            onTap: onCreateNew,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: SedixColors.accent,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: SedixColors.accent.withOpacity(0.38),
+                    offset: const Offset(0, 6),
+                    blurRadius: 14,
+                  ),
+                ],
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.add, color: Colors.white, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'Create New',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Logout
+          GestureDetector(
+            onTap: onLogout,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: clayBox(radius: 14),
+              child: const Icon(Icons.logout,
+                  size: 18, color: SedixColors.textSecondary),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────────────
+
+class _StatsRow extends StatelessWidget {
+  final List<GoalModel> goals;
+
+  const _StatsRow({required this.goals});
+
+  @override
+  Widget build(BuildContext context) {
+    final totalSaved = goals.fold(0.0, (s, g) => s + g.savedAmount);
+    final completed = goals.where((g) => g.isCompleted).length;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          _Stat(
+            label: 'Total saved',
+            value: '\$${totalSaved.toStringAsFixed(0)}',
+            color: SedixColors.accent,
+          ),
+          const SizedBox(width: 12),
+          _Stat(
+            label: 'Goals',
+            value: '${goals.length}',
+            color: SedixColors.textPrimary,
+          ),
+          const SizedBox(width: 12),
+          _Stat(
+            label: 'Completed',
+            value: '$completed',
+            color: SedixColors.success,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _Stat({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: clayBox(radius: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: SedixColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  final VoidCallback onCreateNew;
+
+  const _EmptyState({required this.onCreateNew});
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: clayBox(radius: 60),
+              child: const Text('🏦', style: TextStyle(fontSize: 52)),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'No goals yet',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: SedixColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Create your first saving goal',
+              style: TextStyle(
+                color: SedixColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 28),
+            GestureDetector(
+              onTap: onCreateNew,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 28, vertical: 14),
+                decoration: BoxDecoration(
+                  color: SedixColors.accent,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: SedixColors.accent.withOpacity(0.38),
+                      offset: const Offset(0, 6),
+                      blurRadius: 14,
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'Create goal',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 }

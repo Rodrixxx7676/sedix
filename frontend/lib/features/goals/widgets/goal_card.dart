@@ -1,83 +1,322 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
+import '../../../core/theme/app_theme.dart';
 import '../models/goal_model.dart';
+import 'goal_jar_widget.dart';
 
 class GoalCard extends StatelessWidget {
   final GoalModel goal;
   final VoidCallback onTap;
+  final VoidCallback? onAddMoney;
 
-  const GoalCard({super.key, required this.goal, required this.onTap});
+  const GoalCard({
+    super.key,
+    required this.goal,
+    required this.onTap,
+    this.onAddMoney,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final percent = (goal.progress / 100).clamp(0.0, 1.0);
-
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(goal.emoji, style: const TextStyle(fontSize: 28)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(goal.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w600)),
-                        if (goal.description != null)
-                          Text(
-                            goal.description!,
-                            style: Theme.of(context).textTheme.bodySmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (goal.isCompleted)
-                    Chip(
-                      label: const Text('Done'),
-                      backgroundColor: scheme.primaryContainer,
-                      labelStyle:
-                          TextStyle(color: scheme.onPrimaryContainer, fontSize: 12),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              LinearPercentIndicator(
-                lineHeight: 8,
-                percent: percent,
-                progressColor: goal.isCompleted ? scheme.primary : scheme.primary,
-                backgroundColor: scheme.surfaceContainerHighest,
-                barRadius: const Radius.circular(4),
-                padding: EdgeInsets.zero,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('\$${goal.savedAmount.toStringAsFixed(0)} saved',
-                      style: Theme.of(context).textTheme.bodySmall),
-                  Text('of \$${goal.targetAmount.toStringAsFixed(0)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant)),
-                ],
-              ),
-            ],
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 300,
+        decoration: clayBox(color: SedixColors.surface, radius: 32),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _CardTop(goal: goal),
+            _CardBottom(goal: goal, onAddMoney: onAddMoney),
+          ],
         ),
       ),
     );
   }
+}
+
+// ── Top section (illustrated background + jar) ────────────────────────────────
+
+class _CardTop extends StatelessWidget {
+  final GoalModel goal;
+
+  const _CardTop({required this.goal});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 280,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFDFCBA8), Color(0xFFC8AC7E)],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Subtle dot texture
+          Positioned.fill(child: _DotTexture()),
+
+          // Shelf line
+          Positioned(
+            bottom: 48,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFF9E7B4A).withOpacity(0.45),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+
+          // Jar
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 38),
+              child: GoalJarWidget(
+                progress: goal.progress / 100,
+                width: 160,
+                height: 210,
+              ),
+            ),
+          ),
+
+          // "Create New" emoji shortcut top right
+          Positioned(
+            top: 14,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                goal.emoji,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+
+          // Nav arrow left placeholder
+          Positioned(
+            left: 12,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Icon(Icons.chevron_left,
+                  color: Colors.white.withOpacity(0.5), size: 28),
+            ),
+          ),
+          Positioned(
+            right: 12,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Icon(Icons.chevron_right,
+                  color: Colors.white.withOpacity(0.5), size: 28),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Bottom section (info + button) ────────────────────────────────────────────
+
+class _CardBottom extends StatelessWidget {
+  final GoalModel goal;
+  final VoidCallback? onAddMoney;
+
+  const _CardBottom({required this.goal, this.onAddMoney});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(color: SedixColors.surfaceHigh),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Status badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: goal.isCompleted
+                  ? SedixColors.successLight
+                  : SedixColors.accentLight,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: goal.isCompleted
+                        ? SedixColors.success
+                        : SedixColors.accent,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  goal.isCompleted ? 'Completed' : 'In Progress',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: goal.isCompleted
+                        ? SedixColors.success
+                        : SedixColors.accent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Goal name
+          Text(
+            goal.name,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: SedixColors.textPrimary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          const SizedBox(height: 4),
+
+          // Label
+          Text(
+            goal.isCompleted ? 'Amount Saved' : 'Amount Needed',
+            style: const TextStyle(
+              fontSize: 11,
+              color: SedixColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+
+          // Amount
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '\$${goal.savedAmount.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: SedixColors.textPrimary,
+                  ),
+                ),
+                if (!goal.isCompleted)
+                  TextSpan(
+                    text: '/\$${goal.targetAmount.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: SedixColors.textSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // Add Money button
+          if (!goal.isCompleted)
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap: onAddMoney,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: SedixColors.navy,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: SedixColors.navy.withOpacity(0.35),
+                        offset: const Offset(0, 6),
+                        blurRadius: 16,
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Add Money',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: SedixColors.success,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                alignment: Alignment.center,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle_outline,
+                        color: Colors.white, size: 16),
+                    SizedBox(width: 6),
+                    Text(
+                      'Goal reached!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Dot texture painter ───────────────────────────────────────────────────────
+
+class _DotTexture extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => CustomPaint(painter: _DotsPainter());
+}
+
+class _DotsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = Colors.white.withOpacity(0.12);
+    const gap = 22.0;
+    for (double x = gap; x < size.width; x += gap) {
+      for (double y = gap; y < size.height; y += gap) {
+        canvas.drawCircle(Offset(x, y), 1.5, p);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DotsPainter _) => false;
 }
