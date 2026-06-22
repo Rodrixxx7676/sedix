@@ -11,10 +11,13 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequest req);
 }
 
-public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthService
+public class AuthService(AppDbContext db, ITokenService tokenService, IRecaptchaService recaptcha) : IAuthService
 {
     public async Task<AuthResponse> RegisterAsync(RegisterRequest req)
     {
+        if (!await recaptcha.VerifyAsync(req.RecaptchaToken))
+            throw new InvalidOperationException("Verificación reCAPTCHA fallida. Recarga e intenta de nuevo.");
+
         if (await db.Users.AnyAsync(u => u.Email == req.Email))
             throw new InvalidOperationException("Email already registered.");
 

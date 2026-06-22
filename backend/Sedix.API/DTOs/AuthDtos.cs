@@ -8,7 +8,8 @@ public record RegisterRequest(
     string? Country = null,
     string? DateOfBirth = null,   // ISO date string: "1999-05-20"
     string Currency = "USD",
-    decimal? MonthlyGoal = null
+    decimal? MonthlyGoal = null,
+    string? RecaptchaToken = null
 );
 
 public record LoginRequest(string Email, string Password);

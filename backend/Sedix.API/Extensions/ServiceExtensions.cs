@@ -79,6 +79,7 @@ public static class ServiceExtensions
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     {
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IRecaptchaService, RecaptchaService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IGoalService, GoalService>();
         services.AddScoped<IAdminService, AdminService>();

@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/recaptcha.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -89,6 +90,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       _error = null;
     });
     try {
+      final recaptchaToken = await executeRecaptcha('register');
+
       final client = ref.read(apiClientProvider);
       final res =
           await client.post<Map<String, dynamic>>('/auth/register', data: {
@@ -102,6 +105,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         'currency': _currency,
         if (_goalCtrl.text.trim().isNotEmpty)
           'monthlyGoal': double.tryParse(_goalCtrl.text.trim()),
+        if (recaptchaToken != null) 'recaptchaToken': recaptchaToken,
       });
       await ref.read(authNotifierProvider.notifier).saveToken(res.data!['token']);
       if (mounted) context.go('/');
